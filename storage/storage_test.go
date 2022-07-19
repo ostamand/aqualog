@@ -16,7 +16,7 @@ func TestNewMeasurement(t *testing.T) {
 	username := gofakeit.Username()
 	name := gofakeit.LoremIpsumWord()
 
-	m, err := s.AddMeasurement(context.Background(), AddMeasurementParams{
+	m, err := s.AddValue(context.Background(), AddValueParams{
 		Username: username,
 		Value:    value,
 		Type:     name,
@@ -58,7 +58,7 @@ func TestUniqueValueType(t *testing.T) {
 	var userID int64
 
 	for i := 0; i < n; i++ {
-		v, err := s.AddMeasurement(context.Background(), AddMeasurementParams{
+		v, err := s.AddValue(context.Background(), AddValueParams{
 			Username: username,
 			Value:    gofakeit.Float64(),
 			Type:     valueTypeName,
