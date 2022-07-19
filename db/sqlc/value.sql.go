@@ -41,6 +41,25 @@ func (q *Queries) CreateValue(ctx context.Context, arg CreateValueParams) (Value
 	return i, err
 }
 
+const getValue = `-- name: GetValue :one
+SELECT id, user_id, value_type_id, value, created_at FROM values
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetValue(ctx context.Context, id int64) (Value, error) {
+	row := q.db.QueryRowContext(ctx, getValue, id)
+	var i Value
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ValueTypeID,
+		&i.Value,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const listValuesPerType = `-- name: ListValuesPerType :many
 SELECT id, user_id, value_type_id, value, created_at from values
 WHERE value_type_id = $1
@@ -61,7 +80,7 @@ func (q *Queries) ListValuesPerType(ctx context.Context, arg ListValuesPerTypePa
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Value
+	items := []Value{}
 	for rows.Next() {
 		var i Value
 		if err := rows.Scan(

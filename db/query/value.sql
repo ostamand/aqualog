@@ -10,6 +10,11 @@ INSERT INTO values (
 ) 
 RETURNING *;
 
+-- name: GetValue :one
+SELECT * FROM values
+WHERE id = $1
+LIMIT 1;
+
 -- name: ListValuesPerType :many
 SELECT * from values
 WHERE value_type_id = $1

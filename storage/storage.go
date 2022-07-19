@@ -1,28 +1,30 @@
-package db
+package storage
 
 import (
 	"context"
 	"database/sql"
+
+	db "github.com/ostamand/aqualog/db/sqlc"
 )
 
 type Storage struct {
-	*Queries
+	*db.Queries
 	db *sql.DB
 }
 
-func NewStorage(db *sql.DB) *Storage {
+func NewStorage(conn *sql.DB) *Storage {
 	return &Storage{
-		db:      db,
-		Queries: New(db),
+		db:      conn,
+		Queries: db.New(conn),
 	}
 }
 
-func (s Storage) executeTx(ctx context.Context, fn func(*Queries) error) error {
+func (s Storage) executeTx(ctx context.Context, fn func(*db.Queries) error) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	q := New(tx)
+	q := db.New(tx)
 	err = fn(q)
 	if err != nil {
 		// rollback
@@ -40,14 +42,14 @@ type AddMeasurementParams struct {
 	Type     string  `json:"type"`
 }
 
-func (s Storage) AddMeasurement(ctx context.Context, args AddMeasurementParams) (Value, error) {
-	var v Value
+func (s Storage) AddMeasurement(ctx context.Context, args AddMeasurementParams) (db.Value, error) {
+	var v db.Value
 
-	err := s.executeTx(ctx, func(q *Queries) error {
+	err := s.executeTx(ctx, func(q *db.Queries) error {
 		var err error
 
 		// check if user first
-		var user User
+		var user db.User
 		user, err = q.GetByUsername(ctx, args.Username)
 		if err != nil {
 			// create new username
@@ -59,14 +61,14 @@ func (s Storage) AddMeasurement(ctx context.Context, args AddMeasurementParams) 
 		}
 
 		// check if value type exists
-		var valueType ValueType
-		valueType, err = q.GetValueTypeByName(ctx, GetValueTypeByNameParams{
+		var valueType db.ValueType
+		valueType, err = q.GetValueTypeByName(ctx, db.GetValueTypeByNameParams{
 			UserID: user.ID,
 			Name:   args.Type,
 		})
 		if err != nil {
 			// create new value type for user
-			valueType, err = q.CreateValueType(ctx, CreateValueTypeParams{
+			valueType, err = q.CreateValueType(ctx, db.CreateValueTypeParams{
 				Name:   args.Type,
 				UserID: user.ID,
 			})
@@ -76,7 +78,7 @@ func (s Storage) AddMeasurement(ctx context.Context, args AddMeasurementParams) 
 		}
 
 		// create new measurement
-		v, err = q.CreateValue(ctx, CreateValueParams{
+		v, err = q.CreateValue(ctx, db.CreateValueParams{
 			UserID:      user.ID,
 			ValueTypeID: int32(valueType.ID),
 			Value:       args.Value,

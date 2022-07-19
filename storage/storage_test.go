@@ -1,10 +1,11 @@
-package db
+package storage
 
 import (
 	"context"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
+	db "github.com/ostamand/aqualog/db/sqlc"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,16 +27,16 @@ func TestNewMeasurement(t *testing.T) {
 	assert.Equal(t, m.Value, value)
 
 	// check user was created
-	var user User
+	var user db.User
 	assert.NotEmpty(t, m.UserID)
 	user, err = testQueries.GetUser(context.Background(), m.UserID)
 	assert.NoError(t, err)
 	assert.Equal(t, username, user.Username)
 
 	// check value type was created
-	var valueType ValueType
+	var valueType db.ValueType
 	assert.NotEmpty(t, m.ValueTypeID)
-	valueType, err = testQueries.GetValueTypeByName(context.Background(), GetValueTypeByNameParams{
+	valueType, err = testQueries.GetValueTypeByName(context.Background(), db.GetValueTypeByNameParams{
 		UserID: m.UserID,
 		Name:   name,
 	})
@@ -68,7 +69,7 @@ func TestUniqueValueType(t *testing.T) {
 	}
 
 	// check that we have n values for value type
-	values, err := testQueries.ListValuesPerType(context.Background(), ListValuesPerTypeParams{
+	values, err := testQueries.ListValuesPerType(context.Background(), db.ListValuesPerTypeParams{
 		ValueTypeID: valueTypeID,
 		Limit:       int32(2 * n),
 		Offset:      0,
