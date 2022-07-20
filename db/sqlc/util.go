@@ -3,15 +3,16 @@ package db
 import (
 	"database/sql"
 	"log"
+
+	"github.com/ostamand/aqualog/util"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:secret@localhost:5432/aqualog?sslmode=disable"
-)
-
-func SetupDB() (*Queries, *sql.DB) {
-	testDb, err := sql.Open(dbDriver, dbSource)
+func SetupDB(configPath string) (*Queries, *sql.DB) {
+	config, err := util.LoadConfig(configPath)
+	if err != nil {
+		log.Fatal("Cannot load configs", err)
+	}
+	testDb, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("Cannot connect to the database", err)
 	}

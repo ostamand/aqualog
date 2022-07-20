@@ -14,6 +14,6 @@ var testQueries *db.Queries
 var testDb *sql.DB
 
 func TestMain(m *testing.M) {
-	testQueries, testDb = db.SetupDB()
+	testQueries, testDb = db.SetupDB("..")
 	os.Exit(m.Run())
 }
