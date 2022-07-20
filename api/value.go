@@ -20,12 +20,11 @@ func (server *Server) saveValue(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	arg := storage.AddValueParams{
+	value, err := server.storage.SafeCreateValue(ctx, storage.SafeCreateValueParams{
 		Username: req.Username,
 		Value:    req.Value,
 		Type:     req.Type,
-	}
-	value, err := server.storage.AddValue(ctx, arg)
+	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

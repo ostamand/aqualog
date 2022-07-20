@@ -7,19 +7,25 @@ import (
 	db "github.com/ostamand/aqualog/db/sqlc"
 )
 
-type Storage struct {
+type Storage interface {
+	db.Querier
+	GetValueFilled(ctx context.Context, id int64) (GetValueFilledResponse, error)
+	SafeCreateValue(ctx context.Context, args SafeCreateValueParams) (db.Value, error)
+}
+
+type SQLStorage struct {
 	*db.Queries
 	db *sql.DB
 }
 
-func NewStorage(conn *sql.DB) *Storage {
-	return &Storage{
+func NewStorage(conn *sql.DB) Storage {
+	return &SQLStorage{
 		db:      conn,
 		Queries: db.New(conn),
 	}
 }
 
-func (s Storage) executeTx(ctx context.Context, fn func(*db.Queries) error) error {
+func (s SQLStorage) executeTx(ctx context.Context, fn func(*db.Queries) error) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -36,14 +42,14 @@ func (s Storage) executeTx(ctx context.Context, fn func(*db.Queries) error) erro
 	return tx.Commit()
 }
 
-type GetValueResponse struct {
+type GetValueFilledResponse struct {
 	Value db.Value     `json:"value"`
 	Type  db.ValueType `json:"type"`
 	User  db.User      `json:"user"`
 }
 
-func (s Storage) GetValue(ctx context.Context, id int64) (GetValueResponse, error) {
-	res := GetValueResponse{}
+func (s SQLStorage) GetValueFilled(ctx context.Context, id int64) (GetValueFilledResponse, error) {
+	res := GetValueFilledResponse{}
 
 	// get value
 	value, err := s.Queries.GetValue(ctx, id)
@@ -72,13 +78,13 @@ func (s Storage) GetValue(ctx context.Context, id int64) (GetValueResponse, erro
 	return res, err
 }
 
-type AddValueParams struct {
+type SafeCreateValueParams struct {
 	Username string  `json:"username"`
 	Value    float64 `json:"value"`
 	Type     string  `json:"type"`
 }
 
-func (s Storage) AddValue(ctx context.Context, args AddValueParams) (db.Value, error) {
+func (s SQLStorage) SafeCreateValue(ctx context.Context, args SafeCreateValueParams) (db.Value, error) {
 	var v db.Value
 
 	err := s.executeTx(ctx, func(q *db.Queries) error {
