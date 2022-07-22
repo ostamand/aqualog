@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewMeasurement(t *testing.T) {
-	s := NewStorage(testDb)
+	s := NewSQLStorage(testDb)
 
 	value := gofakeit.Float64()
 	username := gofakeit.Username()
@@ -45,7 +45,7 @@ func TestNewMeasurement(t *testing.T) {
 }
 
 func TestUniqueValueType(t *testing.T) {
-	s := NewStorage(testDb)
+	s := NewSQLStorage(testDb)
 
 	username := gofakeit.Username()
 	valueTypeName := gofakeit.LoremIpsumWord()

@@ -6,6 +6,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/lib/pq v1.10.6
+	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
 )
 
@@ -32,7 +33,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.12.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect

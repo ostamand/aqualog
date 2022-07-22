@@ -23,7 +23,7 @@ func main() {
 		log.Fatal("Cannot connect to the database", err)
 	}
 
-	s := storage.NewStorage(conn)
+	s := storage.NewSQLStorage(conn)
 
 	// start server
 	server := api.NewServer(s)
