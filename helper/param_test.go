@@ -11,7 +11,7 @@ import (
 )
 
 func saveRandomeUser(t *testing.T) db.User {
-	user, err := SaveUser(context.Background(), s, SaveUserParams{
+	user, err := SaveUser(context.Background(), store, SaveUserParams{
 		Username: gofakeit.Username(),
 		Email:    gofakeit.Email(),
 		Password: gofakeit.Password(true, true, true, true, false, 6),
@@ -26,10 +26,10 @@ func TestCanSaveNewParam(t *testing.T) {
 
 	v := gofakeit.Float64Range(0, 10)
 
-	value, err := SaveParam(context.Background(), s, SaveParamArgs{
-		userID:    user.ID,
-		paramName: util.GenerateRandomKey(6),
-		value:     v,
+	value, err := SaveParam(context.Background(), store, SaveParamArgs{
+		UserID:    user.ID,
+		ParamName: util.GenerateRandomKey(6),
+		Value:     v,
 	})
 	assert.NoError(t, err)
 	assert.NotEmpty(t, value)
@@ -40,7 +40,7 @@ func TestCanSaveNewParam(t *testing.T) {
 func TestSaveNewParamTypeExists(t *testing.T) {
 	user := saveRandomeUser(t)
 
-	paramType, err := s.CreateValueType(context.Background(), db.CreateValueTypeParams{
+	paramType, err := store.CreateValueType(context.Background(), db.CreateValueTypeParams{
 		Name:   util.GenerateRandomKey(6),
 		UserID: user.ID,
 	})
@@ -48,10 +48,10 @@ func TestSaveNewParamTypeExists(t *testing.T) {
 	assert.NotEmpty(t, paramType)
 	assert.Equal(t, user.ID, paramType.UserID)
 
-	param, err := SaveParam(context.Background(), s, SaveParamArgs{
-		userID:    user.ID,
-		paramName: paramType.Name,
-		value:     gofakeit.Float64(),
+	param, err := SaveParam(context.Background(), store, SaveParamArgs{
+		UserID:    user.ID,
+		ParamName: paramType.Name,
+		Value:     gofakeit.Float64(),
 	})
 	assert.NoError(t, err)
 	assert.NotEmpty(t, param)

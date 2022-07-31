@@ -10,26 +10,26 @@ import (
 )
 
 type SaveParamArgs struct {
-	userID    int64
-	paramName string
-	value     float64
+	UserID    int64
+	ParamName string
+	Value     float64
 }
 
-func SaveParam(ctx context.Context, s storage.Storage, args SaveParamArgs) (db.Param, error) {
+func SaveParam(ctx context.Context, store storage.Storage, args SaveParamArgs) (db.Param, error) {
 	var param db.Param
 	var paramType db.ParamType
 	var err error
 
 	// get param type by name
-	paramType, err = s.GetParamTypeByName(ctx, db.GetParamTypeByNameParams{
-		UserID: args.userID,
-		Name:   args.paramName,
+	paramType, err = store.GetParamTypeByName(ctx, db.GetParamTypeByNameParams{
+		UserID: args.UserID,
+		Name:   args.ParamName,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			paramType, err = s.CreateValueType(ctx, db.CreateValueTypeParams{
-				Name:   args.paramName,
-				UserID: args.userID,
+			paramType, err = store.CreateValueType(ctx, db.CreateValueTypeParams{
+				Name:   args.ParamName,
+				UserID: args.UserID,
 			})
 			if err != nil {
 				return param, err
@@ -39,10 +39,10 @@ func SaveParam(ctx context.Context, s storage.Storage, args SaveParamArgs) (db.P
 		}
 	}
 
-	param, err = s.CreateParam(ctx, db.CreateParamParams{
-		UserID:      args.userID,
+	param, err = store.CreateParam(ctx, db.CreateParamParams{
+		UserID:      args.UserID,
 		ParamTypeID: paramType.ID,
-		Value:       args.value,
+		Value:       args.Value,
 	})
 
 	return param, err

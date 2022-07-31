@@ -5,21 +5,35 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ostamand/aqualog/helper"
+	"github.com/ostamand/aqualog/token"
 )
 
-type createValueRequest struct {
+type createParamRequest struct {
 	Value     float64 `json:"value" binding:"required,min=0"`
-	ValueType string  `json:"type" binding:"required"`
+	ParamType string  `json:"type" binding:"required"`
 }
 
-func (server *Server) createValue(ctx *gin.Context) {
-	var req createValueRequest
+func (server *Server) createParam(ctx *gin.Context) {
+	var req createParamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
-	//authPayload := ctx.MustGet(authPayloadKey).(*token.Payload)
-
-	//db.CreateValueParams{}
+	authPayload, ok := ctx.MustGet(authPayloadKey).(*token.Payload)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
+		return
+	}
+	param, err := helper.SaveParam(ctx, server.storage, helper.SaveParamArgs{
+		UserID:    authPayload.UserID,
+		ParamName: req.ParamType,
+		Value:     req.Value,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+	ctx.JSON(http.StatusOK, param)
 }
 
 type getValueRequest struct {

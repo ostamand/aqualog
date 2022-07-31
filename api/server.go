@@ -30,7 +30,7 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	router.POST("/login", server.login)
 
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	authRoutes.POST("/params", server.createValue)
+	authRoutes.POST("/params", server.createParam)
 	//router.GET("/values/:id", server.getValue)
 
 	server.router = router

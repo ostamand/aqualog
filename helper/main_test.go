@@ -12,10 +12,10 @@ import (
 
 var testQueries *db.Queries
 var testDb *sql.DB
-var s storage.Storage
+var store storage.Storage
 
 func TestMain(m *testing.M) {
 	testQueries, testDb = db.SetupDB("../")
-	s = storage.NewSQLStorage(testDb)
+	store = storage.NewSQLStorage(testDb)
 	os.Exit(m.Run())
 }
