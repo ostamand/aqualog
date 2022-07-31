@@ -2,7 +2,7 @@ package token
 
 import (
 	"errors"
-	"time"
+	"fmt"
 
 	"github.com/o1egl/paseto"
 	"golang.org/x/crypto/chacha20poly1305"
@@ -20,7 +20,8 @@ type PasetoMaker struct {
 
 func NewPasetoMaker(key string) (TokenMaker, error) {
 	if len(key) != chacha20poly1305.KeySize {
-		return nil, ErrInvalidKeySize
+		err := fmt.Errorf("expected %d got %d: %w", chacha20poly1305.KeySize, len(key), ErrInvalidKeySize)
+		return nil, err
 	}
 	maker := &PasetoMaker{
 		paseto: paseto.NewV2(),
@@ -29,8 +30,8 @@ func NewPasetoMaker(key string) (TokenMaker, error) {
 	return maker, nil
 }
 
-func (maker *PasetoMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
-	payload, err := NewPayload(username, duration)
+func (maker *PasetoMaker) CreateToken(args CreateTokenArgs) (string, *Payload, error) {
+	payload, err := NewPayload(args.Username, args.UserID, args.Duration)
 	if err != nil {
 		return "", payload, err
 	}

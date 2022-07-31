@@ -26,7 +26,7 @@ func main() {
 	s := storage.NewSQLStorage(conn)
 
 	// start server
-	server := api.NewServer(s)
+	server := api.NewServer(config, s)
 	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("Cannot start server", err)

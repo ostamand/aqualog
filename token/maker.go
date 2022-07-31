@@ -2,7 +2,13 @@ package token
 
 import "time"
 
+type CreateTokenArgs struct {
+	Username string
+	UserID   int64
+	Duration time.Duration
+}
+
 type TokenMaker interface {
-	CreateToken(username string, duration time.Duration) (string, *Payload, error)
+	CreateToken(args CreateTokenArgs) (string, *Payload, error)
 	VerifyToken(token string) (*Payload, error)
 }

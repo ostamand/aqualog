@@ -1,21 +1,37 @@
 package api
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ostamand/aqualog/storage"
+	"github.com/ostamand/aqualog/token"
+	"github.com/ostamand/aqualog/util"
 )
 
 type Server struct {
-	storage storage.Storage
-	router  *gin.Engine
+	config     util.Config
+	storage    storage.Storage
+	tokenMaker token.TokenMaker
+	router     *gin.Engine
 }
 
-func NewServer(s storage.Storage) *Server {
-	server := &Server{storage: s}
+func NewServer(config util.Config, s storage.Storage) *Server {
+	t, err := token.NewPasetoMaker(config.TokenKey)
+	if err != nil {
+		log.Fatalf("could not initialize authentication: %s", errorResponse(err))
+	}
+
+	server := &Server{storage: s, tokenMaker: t, config: config}
+
 	router := gin.Default()
 
-	router.POST("/values", server.saveValue)
-	router.GET("/values/:id", server.getValue)
+	router.POST("/users", server.createUser)
+	router.POST("/login", server.login)
+
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes.POST("/params", server.createValue)
+	//router.GET("/values/:id", server.getValue)
 
 	server.router = router
 	return server

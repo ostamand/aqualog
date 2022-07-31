@@ -5,31 +5,21 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ostamand/aqualog/storage"
 )
 
-type saveValueRequest struct {
-	Username string  `json:"username" binding:"required"`
-	Value    float64 `json:"value" binding:"required"`
-	Type     string  `json:"type" binding:"required"`
+type createValueRequest struct {
+	Value     float64 `json:"value" binding:"required,min=0"`
+	ValueType string  `json:"type" binding:"required"`
 }
 
-func (server *Server) saveValue(ctx *gin.Context) {
-	var req saveValueRequest
+func (server *Server) createValue(ctx *gin.Context) {
+	var req createValueRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
-	value, err := server.storage.SafeCreateValue(ctx, storage.SafeCreateValueParams{
-		Username: req.Username,
-		Value:    req.Value,
-		Type:     req.Type,
-	})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-	ctx.JSON(http.StatusOK, value)
+	//authPayload := ctx.MustGet(authPayloadKey).(*token.Payload)
+
+	//db.CreateValueParams{}
 }
 
 type getValueRequest struct {
@@ -42,7 +32,7 @@ func (server *Server) getValue(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	value, err := server.storage.GetValue(ctx, req.ID)
+	value, err := server.storage.GetParam(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))

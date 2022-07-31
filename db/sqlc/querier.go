@@ -9,17 +9,15 @@ import (
 )
 
 type Querier interface {
-	CreateUser(ctx context.Context, username string) (User, error)
-	CreateValue(ctx context.Context, arg CreateValueParams) (Value, error)
-	CreateValueType(ctx context.Context, arg CreateValueTypeParams) (ValueType, error)
+	CreateParam(ctx context.Context, arg CreateParamParams) (Param, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateValueType(ctx context.Context, arg CreateValueTypeParams) (ParamType, error)
 	DeleteUser(ctx context.Context, id int64) error
-	GetByUsername(ctx context.Context, username string) (User, error)
-	GetUser(ctx context.Context, id int64) (User, error)
-	GetValue(ctx context.Context, id int64) (Value, error)
-	GetValueType(ctx context.Context, id int64) (ValueType, error)
-	GetValueTypeByName(ctx context.Context, arg GetValueTypeByNameParams) (ValueType, error)
+	GetParam(ctx context.Context, id int64) (Param, error)
+	GetParamType(ctx context.Context, id int64) (ParamType, error)
+	GetParamTypeByName(ctx context.Context, arg GetParamTypeByNameParams) (ParamType, error)
+	GetUser(ctx context.Context, username string) (User, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
-	ListValuesPerType(ctx context.Context, arg ListValuesPerTypeParams) ([]Value, error)
 }
 
 var _ Querier = (*Queries)(nil)
