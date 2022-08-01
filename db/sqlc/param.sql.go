@@ -71,7 +71,7 @@ func (q *Queries) GetParam(ctx context.Context, id int64) (Param, error) {
 	return i, err
 }
 
-const getParamsByType = `-- name: GetParamsByType :many
+const listParamsByType = `-- name: ListParamsByType :many
 SELECT p.id, p.value, p.timestamp, p.created_at 
 FROM params as p
 INNER JOIN param_types as t ON p.param_type_id = t.id
@@ -84,7 +84,7 @@ LIMIT $6
 OFFSET $5
 `
 
-type GetParamsByTypeParams struct {
+type ListParamsByTypeParams struct {
 	UserID        int64     `json:"user_id"`
 	ParamTypeName string    `json:"param_type_name"`
 	From          time.Time `json:"from"`
@@ -93,15 +93,15 @@ type GetParamsByTypeParams struct {
 	Limit         int32     `json:"limit"`
 }
 
-type GetParamsByTypeRow struct {
+type ListParamsByTypeRow struct {
 	ID        int64     `json:"id"`
 	Value     float64   `json:"value"`
 	Timestamp time.Time `json:"timestamp"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (q *Queries) GetParamsByType(ctx context.Context, arg GetParamsByTypeParams) ([]GetParamsByTypeRow, error) {
-	rows, err := q.db.QueryContext(ctx, getParamsByType,
+func (q *Queries) ListParamsByType(ctx context.Context, arg ListParamsByTypeParams) ([]ListParamsByTypeRow, error) {
+	rows, err := q.db.QueryContext(ctx, listParamsByType,
 		arg.UserID,
 		arg.ParamTypeName,
 		arg.From,
@@ -113,9 +113,9 @@ func (q *Queries) GetParamsByType(ctx context.Context, arg GetParamsByTypeParams
 		return nil, err
 	}
 	defer rows.Close()
-	items := []GetParamsByTypeRow{}
+	items := []ListParamsByTypeRow{}
 	for rows.Next() {
-		var i GetParamsByTypeRow
+		var i ListParamsByTypeRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Value,

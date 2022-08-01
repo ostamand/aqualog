@@ -17,7 +17,7 @@ SELECT * FROM params
 WHERE id = $1
 LIMIT 1;
 
--- name: GetParamsByType :many
+-- name: ListParamsByType :many
 SELECT p.id, p.value, p.timestamp, p.created_at 
 FROM params as p
 INNER JOIN param_types as t ON p.param_type_id = t.id

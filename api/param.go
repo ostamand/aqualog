@@ -56,7 +56,7 @@ func (server *Server) getParams(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
 		return
 	}
-	args := db.GetParamsByTypeParams{
+	args := db.ListParamsByTypeParams{
 		UserID:        payload.UserID,
 		ParamTypeName: req.ParamType, // TODO what to do when not provided?
 		Limit:         req.Limit,
@@ -65,7 +65,7 @@ func (server *Server) getParams(ctx *gin.Context) {
 		To:            req.To,
 	}
 	args.FillDefaults()
-	params, err := server.storage.GetParamsByType(ctx, args)
+	params, err := server.storage.ListParamsByType(ctx, args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

@@ -160,7 +160,7 @@ func TestGetParams(t *testing.T) {
 			}
 
 			// query params using helper
-			args := db.GetParamsByTypeParams{
+			args := db.ListParamsByTypeParams{
 				UserID:        user.ID,
 				ParamTypeName: paramName,
 				From:          tc.from,
@@ -168,7 +168,7 @@ func TestGetParams(t *testing.T) {
 			}
 			args.FillDefaults()
 
-			params, err := store.GetParamsByType(context.Background(), args)
+			params, err := store.ListParamsByType(context.Background(), args)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expect, len(params))
 		})
