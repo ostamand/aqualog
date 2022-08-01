@@ -16,7 +16,7 @@ type Querier interface {
 	GetParam(ctx context.Context, id int64) (Param, error)
 	GetParamType(ctx context.Context, id int64) (ParamType, error)
 	GetParamTypeByName(ctx context.Context, arg GetParamTypeByNameParams) (ParamType, error)
-	GetParams(ctx context.Context, arg GetParamsParams) ([]GetParamsRow, error)
+	GetParamsByType(ctx context.Context, arg GetParamsByTypeParams) ([]GetParamsByTypeRow, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 }

@@ -1,11 +1,11 @@
 package api
 
 import (
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	db "github.com/ostamand/aqualog/db/sqlc"
 	"github.com/ostamand/aqualog/helper"
 	"github.com/ostamand/aqualog/token"
 )
@@ -51,7 +51,26 @@ func (server *Server) getParams(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	log.Println(req)
+	payload, ok := ctx.MustGet(authPayloadKey).(*token.Payload)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
+		return
+	}
+	args := db.GetParamsByTypeParams{
+		UserID:        payload.UserID,
+		ParamTypeName: req.ParamType, // TODO what to do when not provided?
+		Limit:         req.Limit,
+		Offset:        req.Offset,
+		From:          req.From,
+		To:            req.To,
+	}
+	args.FillDefaults()
+	params, err := server.storage.GetParamsByType(ctx, args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, params)
 }
 
 /*
