@@ -21,7 +21,7 @@ func generateRandomUser() db.User {
 }
 
 func TestPasetoMaker(t *testing.T) {
-	maker, err := NewPasetoMaker(util.GenerateRandomKey(keySize))
+	maker, err := NewPasetoMaker(util.GenerateRandomString(keySize))
 	require.NoError(t, err)
 
 	user := generateRandomUser()
@@ -41,7 +41,7 @@ func TestPasetoMaker(t *testing.T) {
 }
 
 func TestExpiredToken(t *testing.T) {
-	maker, err := NewPasetoMaker(util.GenerateRandomKey(keySize))
+	maker, err := NewPasetoMaker(util.GenerateRandomString(keySize))
 	require.NoError(t, err)
 
 	user := generateRandomUser()
@@ -60,13 +60,13 @@ func TestExpiredToken(t *testing.T) {
 }
 
 func TestInvalidKeySize(t *testing.T) {
-	maker, err := NewPasetoMaker(util.GenerateRandomKey(12))
+	maker, err := NewPasetoMaker(util.GenerateRandomString(12))
 	require.ErrorIs(t, err, ErrInvalidKeySize)
 	require.Empty(t, maker)
 }
 
 func TestInvalidToken(t *testing.T) {
-	maker, err := NewPasetoMaker(util.GenerateRandomKey(keySize))
+	maker, err := NewPasetoMaker(util.GenerateRandomString(keySize))
 	require.NoError(t, err)
 	require.NotEmpty(t, maker)
 
@@ -81,7 +81,7 @@ func TestInvalidToken(t *testing.T) {
 	require.NotEmpty(t, token)
 	require.NotEmpty(t, payload)
 
-	otherMaker, err := NewPasetoMaker(util.GenerateRandomKey(keySize))
+	otherMaker, err := NewPasetoMaker(util.GenerateRandomString(keySize))
 	require.NoError(t, err)
 	require.NotEmpty(t, otherMaker)
 

@@ -7,42 +7,52 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createParam = `-- name: CreateParam :one
 INSERT INTO params (
   user_id,
   param_type_id,
-  value
+  value,
+  timestamp
 ) VALUES (
   $1,
   $2,
-  $3
+  $3,
+  $4
 ) 
-RETURNING id, user_id, param_type_id, value, created_at
+RETURNING id, user_id, param_type_id, value, timestamp, created_at
 `
 
 type CreateParamParams struct {
-	UserID      int64   `json:"user_id"`
-	ParamTypeID int64   `json:"param_type_id"`
-	Value       float64 `json:"value"`
+	UserID      int64     `json:"user_id"`
+	ParamTypeID int64     `json:"param_type_id"`
+	Value       float64   `json:"value"`
+	Timestamp   time.Time `json:"timestamp"`
 }
 
 func (q *Queries) CreateParam(ctx context.Context, arg CreateParamParams) (Param, error) {
-	row := q.db.QueryRowContext(ctx, createParam, arg.UserID, arg.ParamTypeID, arg.Value)
+	row := q.db.QueryRowContext(ctx, createParam,
+		arg.UserID,
+		arg.ParamTypeID,
+		arg.Value,
+		arg.Timestamp,
+	)
 	var i Param
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
 		&i.ParamTypeID,
 		&i.Value,
+		&i.Timestamp,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getParam = `-- name: GetParam :one
-SELECT id, user_id, param_type_id, value, created_at FROM params
+SELECT id, user_id, param_type_id, value, timestamp, created_at FROM params
 WHERE id = $1
 LIMIT 1
 `
@@ -55,7 +65,74 @@ func (q *Queries) GetParam(ctx context.Context, id int64) (Param, error) {
 		&i.UserID,
 		&i.ParamTypeID,
 		&i.Value,
+		&i.Timestamp,
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getParams = `-- name: GetParams :many
+SELECT p.id, p.user_id, p.value, p.timestamp, p.created_at 
+FROM params as p
+INNER JOIN param_types as t ON p.param_type_id = t.id
+WHERE p.user_id = $1
+	AND t.name = $2
+	AND p.timestamp >= $3
+	AND p.timestamp < $4
+ORDER BY p.timestamp
+LIMIT $6
+OFFSET $5
+`
+
+type GetParamsParams struct {
+	UserID        int64     `json:"user_id"`
+	ParamTypeName string    `json:"param_type_name"`
+	From          time.Time `json:"from"`
+	To            time.Time `json:"to"`
+	Offset        int32     `json:"offset"`
+	Limit         int32     `json:"limit"`
+}
+
+type GetParamsRow struct {
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	Value     float64   `json:"value"`
+	Timestamp time.Time `json:"timestamp"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (q *Queries) GetParams(ctx context.Context, arg GetParamsParams) ([]GetParamsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getParams,
+		arg.UserID,
+		arg.ParamTypeName,
+		arg.From,
+		arg.To,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetParamsRow{}
+	for rows.Next() {
+		var i GetParamsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Value,
+			&i.Timestamp,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

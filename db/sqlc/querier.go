@@ -10,12 +10,13 @@ import (
 
 type Querier interface {
 	CreateParam(ctx context.Context, arg CreateParamParams) (Param, error)
+	CreateParamType(ctx context.Context, arg CreateParamTypeParams) (ParamType, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	CreateValueType(ctx context.Context, arg CreateValueTypeParams) (ParamType, error)
 	DeleteUser(ctx context.Context, id int64) error
 	GetParam(ctx context.Context, id int64) (Param, error)
 	GetParamType(ctx context.Context, id int64) (ParamType, error)
 	GetParamTypeByName(ctx context.Context, arg GetParamTypeByNameParams) (ParamType, error)
+	GetParams(ctx context.Context, arg GetParamsParams) ([]GetParamsRow, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 }

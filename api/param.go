@@ -1,8 +1,9 @@
 package api
 
 import (
-	"database/sql"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ostamand/aqualog/helper"
@@ -36,6 +37,25 @@ func (server *Server) createParam(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, param)
 }
 
+type getParamsRequest struct {
+	ParamType string    `form:"type"`
+	Limit     int32     `form:"limit,default=100"`
+	Offset    int32     `form:"offset,default=0"`
+	From      time.Time `form:"from"`
+	To        time.Time `form:"to"`
+}
+
+func (server *Server) getParams(ctx *gin.Context) {
+	var req getParamsRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	log.Println(req)
+}
+
+/*
+
 type getValueRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
@@ -57,3 +77,4 @@ func (server *Server) getValue(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, value)
 }
+*/

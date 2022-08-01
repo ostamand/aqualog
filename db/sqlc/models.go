@@ -14,6 +14,7 @@ type Param struct {
 	UserID      int64     `json:"user_id"`
 	ParamTypeID int64     `json:"param_type_id"`
 	Value       float64   `json:"value"`
+	Timestamp   time.Time `json:"timestamp"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 

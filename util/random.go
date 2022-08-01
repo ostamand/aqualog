@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func GenerateRandomKey(size int) string {
+func GenerateRandomString(size int) string {
 	chars := "abcdefghijklmnopqrtuvwxyz"
 	n := len(chars)
 	var sb strings.Builder

@@ -8,7 +8,7 @@ SELECT * FROM param_types
 WHERE id = $1
 LIMIT 1;
 
--- name: CreateValueType :one
+-- name: CreateParamType :one
 INSERT INTO param_types (
   name,
   description,

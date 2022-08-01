@@ -12,6 +12,7 @@ CREATE TABLE "params" (
   "user_id" bigint NOT NULL,
   "param_type_id" bigint NOT NULL,
   "value" float NOT NULL,
+  "timestamp" timestamptz NOT NULL DEFAULT (now()),
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 

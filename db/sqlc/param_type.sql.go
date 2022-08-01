@@ -10,7 +10,7 @@ import (
 	"database/sql"
 )
 
-const createValueType = `-- name: CreateValueType :one
+const createParamType = `-- name: CreateParamType :one
 INSERT INTO param_types (
   name,
   description,
@@ -31,7 +31,7 @@ INSERT INTO param_types (
 RETURNING id, name, description, unit, user_id, target, min, max, created_at
 `
 
-type CreateValueTypeParams struct {
+type CreateParamTypeParams struct {
 	Name        string          `json:"name"`
 	Description sql.NullString  `json:"description"`
 	Unit        string          `json:"unit"`
@@ -41,8 +41,8 @@ type CreateValueTypeParams struct {
 	Max         sql.NullFloat64 `json:"max"`
 }
 
-func (q *Queries) CreateValueType(ctx context.Context, arg CreateValueTypeParams) (ParamType, error) {
-	row := q.db.QueryRowContext(ctx, createValueType,
+func (q *Queries) CreateParamType(ctx context.Context, arg CreateParamTypeParams) (ParamType, error) {
+	row := q.db.QueryRowContext(ctx, createParamType,
 		arg.Name,
 		arg.Description,
 		arg.Unit,
