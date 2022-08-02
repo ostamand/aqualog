@@ -11,8 +11,9 @@ import (
 )
 
 type createParamRequest struct {
-	Value     float64 `json:"value" binding:"required,min=0"`
-	ParamType string  `json:"type" binding:"required"`
+	Value     float64   `json:"value" binding:"required,min=0"`
+	ParamType string    `json:"type" binding:"required"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 func (server *Server) createParam(ctx *gin.Context) {
@@ -30,6 +31,7 @@ func (server *Server) createParam(ctx *gin.Context) {
 		UserID:    authPayload.UserID,
 		ParamName: req.ParamType,
 		Value:     req.Value,
+		Timestamp: req.Timestamp,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
