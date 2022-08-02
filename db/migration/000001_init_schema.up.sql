@@ -1,18 +1,22 @@
 CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
   "username" varchar UNIQUE NOT NULL,
+  "hashed_password" varchar NOT NULL,
+  "email" varchar NOT NULL,
+  "admin" boolean NOT NULL DEFAULT (false),
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "values" (
+CREATE TABLE "params" (
   "id" bigserial PRIMARY KEY,
   "user_id" bigint NOT NULL,
-  "value_type_id" int NOT NULL,
+  "param_type_id" bigint NOT NULL,
   "value" float NOT NULL,
+  "timestamp" timestamptz NOT NULL DEFAULT (now()),
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "value_types" (
+CREATE TABLE "param_types" (
   "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "description" varchar,
@@ -26,16 +30,16 @@ CREATE TABLE "value_types" (
 
 CREATE INDEX ON "users" ("username");
 
-CREATE INDEX ON "values" ("user_id");
+CREATE INDEX ON "params" ("user_id");
 
-CREATE INDEX ON "values" ("user_id", "value_type_id");
+CREATE INDEX ON "params" ("user_id", "param_type_id");
 
-CREATE INDEX ON "value_types" ("user_id");
+CREATE INDEX ON "param_types" ("user_id");
 
-CREATE INDEX ON "value_types" ("user_id", "name");
+CREATE INDEX ON "param_types" ("user_id", "name");
 
-ALTER TABLE "values" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "params" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "values" ADD FOREIGN KEY ("value_type_id") REFERENCES "value_types" ("id");
+ALTER TABLE "params" ADD FOREIGN KEY ("param_type_id") REFERENCES "param_types" ("id");
 
-ALTER TABLE "value_types" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "param_types" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

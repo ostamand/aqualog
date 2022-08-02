@@ -9,21 +9,16 @@ import (
 	"time"
 )
 
-type User struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type Value struct {
+type Param struct {
 	ID          int64     `json:"id"`
 	UserID      int64     `json:"user_id"`
-	ValueTypeID int32     `json:"value_type_id"`
+	ParamTypeID int64     `json:"param_type_id"`
 	Value       float64   `json:"value"`
+	Timestamp   time.Time `json:"timestamp"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type ValueType struct {
+type ParamType struct {
 	ID          int64           `json:"id"`
 	Name        string          `json:"name"`
 	Description sql.NullString  `json:"description"`
@@ -33,4 +28,13 @@ type ValueType struct {
 	Min         sql.NullFloat64 `json:"min"`
 	Max         sql.NullFloat64 `json:"max"`
 	CreatedAt   time.Time       `json:"created_at"`
+}
+
+type User struct {
+	ID             int64     `json:"id"`
+	Username       string    `json:"username"`
+	HashedPassword string    `json:"hashed_password"`
+	Email          string    `json:"email"`
+	Admin          bool      `json:"admin"`
+	CreatedAt      time.Time `json:"created_at"`
 }

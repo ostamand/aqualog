@@ -1,17 +1,16 @@
 -- name: CreateUser :one
 INSERT INTO users (
-  username
+  username,
+  email,
+  hashed_password
 ) VALUES (
-  $1
+  $1,
+  $2,
+  $3
 ) 
 RETURNING *;
 
 -- name: GetUser :one
-SELECT * FROM users
-WHERE id = $1 
-LIMIT 1;
-
--- name: GetByUsername :one
 SELECT * FROM users
 WHERE username = $1 
 LIMIT 1;
