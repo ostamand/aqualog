@@ -14,9 +14,10 @@ import (
 	"github.com/ostamand/aqualog/api"
 )
 
-const apiAddress = "http://localhost:8080" // TODO how to not hard code this and get at build time
+const apiEndpoint = "http://localhost:8080" // TODO how to not hard code this and get at build time
 const reqContentType = "application/json"
 const apiTokenType = "Bearer"
+const apiEndpointEnv = "AQUALOG_ENDPOINT"
 
 var ErrUserNotFound = errors.New("user does not exists")
 var ErrWrongPassword = errors.New("wrong password")
@@ -36,16 +37,24 @@ func saveLoginResp(resp api.LoginResponse) {
 }
 
 type aqualogAPI struct {
-	apiAddress  string
+	endpoint    string
 	accessToken string
 	username    string
 	email       string
 }
 
 func NewAqualogAPI() aqualogAPI {
-	return aqualogAPI{
-		apiAddress: apiAddress,
+	// setup API endpoint
+	var aqualog aqualogAPI
+
+	endpoint, present := os.LookupEnv(apiEndpointEnv)
+	if present {
+		aqualog.endpoint = endpoint
+	} else {
+		aqualog.endpoint = apiEndpoint
 	}
+
+	return aqualog
 }
 
 func (aqualog *aqualogAPI) LoadAuth() error {
@@ -88,11 +97,10 @@ func (aqualog *aqualogAPI) Login(username string, password string) error {
 		return err
 	}
 
-	httpResp, err := http.Post(aqualog.apiAddress+"/login", reqContentType, bytes.NewBuffer(data))
+	httpResp, err := http.Post(aqualog.endpoint+"/login", reqContentType, bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
-
 	code := httpResp.StatusCode
 	if code != http.StatusOK {
 		if code == http.StatusNotFound {
@@ -123,7 +131,7 @@ func (aqualog *aqualogAPI) CreateParam(args api.CreateParamRequest) error {
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, aqualog.apiAddress+"/params", bytes.NewBuffer(data))
+	req, err := http.NewRequest(http.MethodPost, aqualog.endpoint+"/params", bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
