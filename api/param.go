@@ -10,14 +10,14 @@ import (
 	"github.com/ostamand/aqualog/token"
 )
 
-type createParamRequest struct {
+type CreateParamRequest struct {
 	Value     float64   `json:"value" binding:"required,min=0"`
 	ParamType string    `json:"type" binding:"required"`
 	Timestamp time.Time `json:"timestamp"`
 }
 
 func (server *Server) createParam(ctx *gin.Context) {
-	var req createParamRequest
+	var req CreateParamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return

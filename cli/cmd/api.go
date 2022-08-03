@@ -15,9 +15,12 @@ import (
 )
 
 const apiAddress = "http://localhost:8080" // TODO how to not hard code this and get at build time
+const reqContentType = "application/json"
+const apiTokenType = "Bearer"
 
 var ErrUserNotFound = errors.New("user does not exists")
 var ErrWrongPassword = errors.New("wrong password")
+var ErrNeedToLogin = errors.New("new login required")
 
 func getAutPath() string {
 	home, _ := os.UserHomeDir()
@@ -85,7 +88,7 @@ func (aqualog *aqualogAPI) Login(username string, password string) error {
 		return err
 	}
 
-	httpResp, err := http.Post(aqualog.apiAddress+"/login", "application/json", bytes.NewBuffer(data))
+	httpResp, err := http.Post(aqualog.apiAddress+"/login", reqContentType, bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
@@ -98,7 +101,7 @@ func (aqualog *aqualogAPI) Login(username string, password string) error {
 			return ErrWrongPassword
 		}
 		// TODO add bad request password validation
-		return fmt.Errorf("api request error, try again")
+		return fmt.Errorf("api request error")
 	}
 
 	// decode response body
@@ -111,5 +114,37 @@ func (aqualog *aqualogAPI) Login(username string, password string) error {
 
 	// save login response to home folder
 	saveLoginResp(resp)
+	return nil
+}
+
+func (aqualog *aqualogAPI) CreateParam(args api.CreateParamRequest) error {
+	data, err := json.Marshal(args)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, aqualog.apiAddress+"/params", bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", reqContentType)
+	req.Header.Add("Authorization", apiTokenType+" "+aqualog.accessToken)
+
+	client := &http.Client{}
+	httpResp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer httpResp.Body.Close()
+
+	code := httpResp.StatusCode
+	if code != http.StatusOK {
+		if code == http.StatusUnauthorized {
+			return ErrNeedToLogin
+		}
+		return fmt.Errorf("api request error")
+	}
+
 	return nil
 }

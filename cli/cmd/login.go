@@ -25,7 +25,7 @@ var loginCmd = &cobra.Command{
 			} else if errors.Is(err, ErrUserNotFound) {
 				color.Error.Println("User does not exists.") // TODO add info how to create a new user
 			} else {
-				color.Error.Println("Login failed. Try again.")
+				color.Error.Println("Login failed.")
 			}
 			return
 		}
