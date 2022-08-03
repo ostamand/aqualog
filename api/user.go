@@ -17,14 +17,14 @@ type createUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-type userResponse struct {
+type UserResponse struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func buildUserResponse(user db.User) userResponse {
-	return userResponse{
+func buildUserResponse(user db.User) UserResponse {
+	return UserResponse{
 		Username:  user.Username,
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
@@ -54,19 +54,19 @@ func (server *Server) createUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-type loginRequest struct {
+type LoginRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-type loginResponse struct {
+type LoginResponse struct {
 	AccessToken          string       `json:"access_token"`
 	AccessTokenExpiresAt time.Time    `json:"access_token_expires_at"`
-	User                 userResponse `json:"user"`
+	User                 UserResponse `json:"user"`
 }
 
 func (server *Server) login(ctx *gin.Context) {
-	var req loginRequest
+	var req LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -95,7 +95,7 @@ func (server *Server) login(ctx *gin.Context) {
 		return
 	}
 
-	resp := loginResponse{
+	resp := LoginResponse{
 		AccessToken:          key,
 		AccessTokenExpiresAt: payload.ExpiredAt,
 		User:                 buildUserResponse(user),

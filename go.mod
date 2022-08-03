@@ -6,6 +6,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/google/uuid v1.3.0
+	github.com/gookit/color v1.5.1
 	github.com/lib/pq v1.10.6
 	github.com/o1egl/paseto v1.0.0
 	github.com/spf13/cobra v1.5.0
@@ -44,6 +45,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
+	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
