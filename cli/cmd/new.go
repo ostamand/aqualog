@@ -6,6 +6,8 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/gookit/color"
 	"github.com/ostamand/aqualog/api"
@@ -20,12 +22,24 @@ var newCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		paramType, _ := cmd.Flags().GetString("type")
 		value, _ := cmd.Flags().GetFloat64("value")
-		//ts, _ := cmd.Flags().GetString("timestamp")
+		timeString, _ := cmd.Flags().GetString("timestamp")
 
-		err := aqualog.CreateParam(api.CreateParamRequest{
+		req := api.CreateParamRequest{
 			ParamType: paramType,
 			Value:     value,
-		})
+		}
+
+		if timeString != "" {
+			ts, err := time.ParseInLocation("2006-01-02 15:04:05", timeString, time.Local)
+			if err != nil {
+				fmt.Println(err)
+				color.Error.Println("Wrong timestamp format, use: YYYY-MM-DD HH:MM:SS")
+				return
+			}
+			req.Timestamp = ts
+		}
+
+		err := aqualog.CreateParam(req)
 		if err != nil {
 			if errors.Is(err, ErrNeedToLogin) {
 				color.Error.Println("Please login to Aqualog using `aqualog login`.")
@@ -47,5 +61,5 @@ func init() {
 	newCmd.Flags().Float64P("value", "v", 0, "the param value")
 	newCmd.MarkFlagRequired("value")
 
-	//newCmd.Flags().StringP("timestamp", "ts", "", "when was the measurement taken")
+	newCmd.Flags().String("timestamp", "", "when was the measurement taken")
 }
