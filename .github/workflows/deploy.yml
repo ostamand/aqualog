@@ -51,7 +51,8 @@ jobs:
           DB_SOURCE: "${{ steps.secrets.outputs.db }}"
         run: |
           pip install dump-env
-          dump-env --source=app.env > app.env
+          dump-env --template=app.env
+          dump-env --template=app.env > app.env
 
       - name: Build & push docker image
         env:
