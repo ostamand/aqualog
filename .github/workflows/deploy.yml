@@ -33,8 +33,9 @@ jobs:
           secrets: |-
             db:projects/585499903514/secrets/aqualog-db-production
 
-      - name: Build docker image
+      - name: Dump env
         env:
           DB_SOURCE: "${{ steps.secrets.outputs.db }}"
         run: |
-          echo $DB_SOURCE
+          pip install dump-env
+          dump-env --source=app.env
