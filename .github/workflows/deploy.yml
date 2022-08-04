@@ -46,18 +46,12 @@ jobs:
           secrets: |-
             db:projects/585499903514/secrets/aqualog-db-production
 
-      - name: Dump env from secrets
-        env:
-          DB_SOURCE: "${{ steps.secrets.outputs.db }}"
-        run: |
-          pip install dump-env
-          dump-env --source=app.env
-          dump-env --source=app.env > test.env
-
       - name: Build & push docker image
         env:
           IMAGE_TAG: ${{ github.sha }}
+          DB_SOURCE: "${{ steps.secrets.outputs.db }}"
         run: |
+          env > app.env
           docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}" .
           docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}"
 
