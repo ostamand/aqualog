@@ -44,6 +44,8 @@ jobs:
         env:
           DB_SOURCE: "${{ steps.secrets.outputs.db }}"
         run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+          mv migrate /bin/migrate
           migrate -path db/migration -database "$DB_SOURCE" -verbose up
 
       - name: Build & push
