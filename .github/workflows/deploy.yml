@@ -43,13 +43,18 @@ jobs:
         name: Get Secret Manager secrets
         uses: google-github-actions/get-secretmanager-secrets@v0
         with:
-          secrets: |-
+          secrets: |
             db:projects/585499903514/secrets/aqualog-db-production
+            token:projects/585499903514/secrets/aqualog-token-production
 
       - name: Build & push docker image
         env:
           IMAGE_TAG: ${{ github.sha }}
+          DB_DRIVER: postgres
           DB_SOURCE: "${{ steps.secrets.outputs.db }}"
+          SERVER_ADDRESS: 0.0.0.0:8080
+          TOKEN_KEY: "${{ steps.secrets.outputs.token }}"
+          TOKEN_DURATION: 600m
         run: |
           env > app.env
           docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}" .
