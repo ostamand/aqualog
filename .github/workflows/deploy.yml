@@ -36,7 +36,7 @@ jobs:
 
       - name: "Authenticate docker"
         run: |
-          gcloud auth configure-docker us-docker.pkg.dev
+          gcloud auth configure-docker us-east4-docker.pkg.dev
 
       - id: secrets
         name: Get Secret Manager secrets
@@ -66,10 +66,3 @@ jobs:
           curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
           sudo mv migrate /bin/migrate
           migrate -path db/migration -database "$DB_SOURCE" -verbose up
-
-      - id: "deploy"
-        name: Deploy to Cloud Run
-        uses: "google-github-actions/deploy-cloudrun@v0"
-        with:
-          service: ${{env.SERVICE}}
-          image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
