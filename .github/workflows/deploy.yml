@@ -55,6 +55,7 @@ jobs:
           SERVER_ADDRESS: 0.0.0.0:8080
           TOKEN_KEY: "${{ steps.secrets.outputs.token }}"
           TOKEN_DURATION: 600m
+          GIN_MODE: release
         run: |
           env > app.env
           docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}" .

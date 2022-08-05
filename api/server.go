@@ -2,12 +2,15 @@ package api
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ostamand/aqualog/storage"
 	"github.com/ostamand/aqualog/token"
 	"github.com/ostamand/aqualog/util"
 )
+
+const ginReleaseEnv = "GIN_MODE"
 
 type Server struct {
 	config     util.Config
@@ -17,6 +20,12 @@ type Server struct {
 }
 
 func NewServer(config util.Config, s storage.Storage) *Server {
+	// set production mode if needed
+	mode := os.Getenv(ginReleaseEnv)
+	if mode != "" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	t, err := token.NewPasetoMaker(config.TokenKey)
 	if err != nil {
 		log.Fatalf("could not initialize authentication: %s", errorResponse(err))
