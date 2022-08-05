@@ -3,8 +3,6 @@ name: Deploy to production
 on:
   push:
     branches: ["master"]
-  pull_request:
-    branches: ["master"]
 
 env:
   GAR_LOCATION: us-east4
