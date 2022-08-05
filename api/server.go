@@ -17,6 +17,8 @@ type Server struct {
 }
 
 func NewServer(config util.Config, s storage.Storage) *Server {
+	gin.SetMode(config.Mode)
+
 	t, err := token.NewPasetoMaker(config.TokenKey)
 	if err != nil {
 		log.Fatalf("could not initialize authentication: %s", errorResponse(err))
