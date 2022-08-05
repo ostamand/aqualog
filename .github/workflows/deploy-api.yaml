@@ -1,4 +1,4 @@
-name: Deploy to production
+name: Deploy API
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
 env:
   GAR_LOCATION: us-east4
   REPOSITORY: aqualog
-  SERVICE: server
+  SERVICE: api
   PROJECT_ID: ostamand
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy API
     runs-on: ubuntu-latest
 
     steps:
@@ -69,4 +69,4 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{env.REPOSITORY}} --image "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}" --max-instances 2 --region=${{env.GAR_LOCATION}}
+          gcloud run deploy ${{env.REPOSITORY}}-${{env.SERVICE}} --image "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{env.SERVICE}}:${{ github.sha }}" --max-instances 2 --region=${{env.GAR_LOCATION}}
