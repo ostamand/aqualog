@@ -24,6 +24,3 @@ notes.md
 # project files
 aqualog
 gha-creds-*.json
-node_modules
-dist
-.parcel-cache
