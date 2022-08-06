@@ -52,7 +52,8 @@ jobs:
           DB_SOURCE: "${{ steps.secrets.outputs.db }}"
           SERVER_ADDRESS: 0.0.0.0:8080
           TOKEN_KEY: "${{ steps.secrets.outputs.token }}"
-          TOKEN_DURATION: 600m
+          TOKEN_DURATION: 15m
+          REFRESH_TOKEN_DURATION: 24h
           GIN_MODE: release
         run: |
           env > app.env
