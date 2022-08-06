@@ -27,15 +27,17 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	server := &Server{storage: s, tokenMaker: t, config: config}
 
 	router := gin.Default()
+	router.Use(corsMiddleware())
 
 	router.POST("/users", server.createUser)
 	router.POST("/login", server.login)
 
-	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes := router.Use(authMiddleware(server.tokenMaker))
 	authRoutes.POST("/params", server.createParam)
 	authRoutes.GET("/params", server.getParams)
 
 	server.router = router
+
 	return server
 }
 

@@ -17,6 +17,16 @@ const (
 
 var errInvalidToken = errorResponse(fmt.Errorf("invalid authorization header"))
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		if ctx.Request.Method == http.MethodOptions {
+			ctx.AbortWithStatus(http.StatusNoContent)
+		}
+		ctx.Next()
+	}
+}
+
 func authMiddleware(token token.TokenMaker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// get token
