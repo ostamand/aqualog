@@ -44,7 +44,7 @@ var loginCmd = &cobra.Command{
 			return nil
 		})
 		if err != nil {
-			color.Error.Println("Prompt failed")
+			color.Error.Println(promptFailedMessage)
 			return
 		}
 
@@ -56,7 +56,7 @@ var loginCmd = &cobra.Command{
 			return nil
 		})
 		if err != nil {
-			color.Error.Println("Prompt failed")
+			color.Error.Println(promptFailedMessage)
 			return
 		}
 
