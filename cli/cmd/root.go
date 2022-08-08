@@ -8,6 +8,8 @@ import (
 
 var aqualog aqualogAPI
 
+const promptFailedMessage = "Prompt failed"
+
 var rootCmd = &cobra.Command{
 	Use:   "aqualog",
 	Short: "Reef aquarium logging made easy, fun and free",
