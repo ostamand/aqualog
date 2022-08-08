@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/ostamand/aqualog/api"
 )
@@ -22,25 +22,11 @@ const apiEndpointEnv = "AQUALOG_ENDPOINT"
 var ErrUserNotFound = errors.New("user does not exists")
 var ErrWrongPassword = errors.New("wrong password")
 var ErrNeedToLogin = errors.New("new login required")
-
-func getAutPath() string {
-	home, _ := os.UserHomeDir()
-	path := filepath.Join(home, ".aqualog")
-	os.MkdirAll(path, os.ModePerm)
-	return path
-}
-
-func saveLoginResp(resp api.LoginResponse) {
-	path := getAutPath()
-	bodyData, _ := json.Marshal(resp)
-	_ = ioutil.WriteFile(filepath.Join(path, "auth.json"), bodyData, 0644)
-}
+var ErrAPI = errors.New("issue with Aqualog API")
 
 type aqualogAPI struct {
-	endpoint    string
-	accessToken string
-	username    string
-	email       string
+	endpoint string
+	auth     api.LoginResponse
 }
 
 func NewAqualogAPI() aqualogAPI {
@@ -57,8 +43,42 @@ func NewAqualogAPI() aqualogAPI {
 	return aqualog
 }
 
+// CreateParam saves a new parameter on Aqualog
+func (aqualog *aqualogAPI) CreateParam(args api.CreateParamRequest) error {
+	data, err := json.Marshal(args)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, aqualog.endpoint+"/params", bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", reqContentType)
+	req.Header.Add("Authorization", apiTokenType+" "+aqualog.auth.AccessToken)
+
+	client := &http.Client{}
+	httpResp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer httpResp.Body.Close()
+
+	code := httpResp.StatusCode
+	if code != http.StatusOK {
+		if code == http.StatusUnauthorized {
+			return ErrNeedToLogin
+		}
+		return fmt.Errorf("api request error")
+	}
+
+	return nil
+}
+
+// LoadAuth will get access and refresh token from local storage.
 func (aqualog *aqualogAPI) LoadAuth() error {
-	path := getAutPath()
+	path := GetAutPath()
 
 	// check if auth file exists
 	if _, err := os.Stat(path); err != nil {
@@ -79,13 +99,12 @@ func (aqualog *aqualogAPI) LoadAuth() error {
 	if err != nil {
 		return err
 	}
-	aqualog.accessToken = data.AccessToken
-	aqualog.username = data.User.Username
-	aqualog.email = data.User.Email
+	aqualog.auth = data
 
 	return nil
 }
 
+// Login call Aqualog API to get access and renew tokens.
 func (aqualog *aqualogAPI) Login(username string, password string) error {
 	req := api.LoginRequest{
 		Username: username,
@@ -114,44 +133,58 @@ func (aqualog *aqualogAPI) Login(username string, password string) error {
 
 	// decode response body
 	var resp api.LoginResponse
-	json.NewDecoder(httpResp.Body).Decode(&resp)
+	err = json.NewDecoder(httpResp.Body).Decode(&resp)
+	if err != nil {
+		return err
+	}
 
-	aqualog.accessToken = resp.AccessToken
-	aqualog.username = resp.User.Username
-	aqualog.email = resp.User.Email
-
+	aqualog.auth = resp
 	// save login response to home folder
-	saveLoginResp(resp)
+	SaveLoginResp(resp)
 	return nil
 }
 
-func (aqualog *aqualogAPI) CreateParam(args api.CreateParamRequest) error {
-	data, err := json.Marshal(args)
-	if err != nil {
-		return err
+// RenewTokenIf will renew the access token only if needed i.e. access token is expired.
+func (aqualog *aqualogAPI) RenewTokenIf() error {
+	if (aqualog.auth == api.LoginResponse{}) {
+		return ErrNeedToLogin
 	}
+	// check if access token is expired
+	if time.Now().After(aqualog.auth.AccessTokenExpiresAt) {
+		// need to renew acess token
+		if time.Now().Before(aqualog.auth.RenewTokenExpiresAt) {
+			// can renew using the refresh token
+			req := api.RenewTokenRequest{
+				RenewToken: aqualog.auth.RenewToken,
+			}
+			data, err := json.Marshal(req)
+			if err != nil {
+				return ErrNeedToLogin
+			}
+			httpResp, err := http.Post(aqualog.endpoint+"/renew_token", reqContentType, bytes.NewBuffer(data))
+			if err != nil {
+				return err
+			}
+			code := httpResp.StatusCode
+			if code != http.StatusOK {
+				return ErrAPI
+			}
 
-	req, err := http.NewRequest(http.MethodPost, aqualog.endpoint+"/params", bytes.NewBuffer(data))
-	if err != nil {
-		return err
-	}
+			// decode response body
+			var resp api.RenewTokenResponse
+			err = json.NewDecoder(httpResp.Body).Decode(&resp)
+			if err != nil {
+				return err
+			}
 
-	req.Header.Add("Content-Type", reqContentType)
-	req.Header.Add("Authorization", apiTokenType+" "+aqualog.accessToken)
+			aqualog.auth.AccessToken = resp.AccessToken
+			aqualog.auth.AccessTokenExpiresAt = resp.AccessTokenExpiresAt
 
-	client := &http.Client{}
-	httpResp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer httpResp.Body.Close()
-
-	code := httpResp.StatusCode
-	if code != http.StatusOK {
-		if code == http.StatusUnauthorized {
+			// save with new access token
+			SaveLoginResp(aqualog.auth)
+		} else {
 			return ErrNeedToLogin
 		}
-		return fmt.Errorf("api request error")
 	}
 
 	return nil

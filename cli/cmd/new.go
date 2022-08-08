@@ -24,6 +24,12 @@ var newCmd = &cobra.Command{
 		value, _ := cmd.Flags().GetFloat64("value")
 		timeString, _ := cmd.Flags().GetString("timestamp")
 
+		authChan := make(chan error)
+
+		go func() {
+			authChan <- aqualog.RenewTokenIf()
+		}()
+
 		req := api.CreateParamRequest{
 			ParamType: paramType,
 			Value:     value,
@@ -37,6 +43,14 @@ var newCmd = &cobra.Command{
 				return
 			}
 			req.Timestamp = ts
+		}
+
+		// check access token first
+		authErr := <-authChan
+		if authErr != nil {
+			fmt.Println(authErr)
+			color.Error.Println("Please login to Aqualog using `aqualog login`.")
+			return
 		}
 
 		err := aqualog.CreateParam(req)

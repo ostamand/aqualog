@@ -9,17 +9,17 @@ import (
 	"github.com/ostamand/aqualog/token"
 )
 
-type renewTokenRequest struct {
+type RenewTokenRequest struct {
 	RenewToken string `json:"renew_token"`
 }
 
-type renewTokenResponse struct {
+type RenewTokenResponse struct {
 	AccessToken          string    `json:"access_token"`
 	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
 }
 
 func (server *Server) renewToken(ctx *gin.Context) {
-	var req renewTokenRequest
+	var req RenewTokenRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -70,7 +70,7 @@ func (server *Server) renewToken(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	resp := renewTokenResponse{
+	resp := RenewTokenResponse{
 		AccessToken:          accessToken,
 		AccessTokenExpiresAt: accessPayload.ExpiredAt,
 	}
