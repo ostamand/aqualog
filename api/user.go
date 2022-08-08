@@ -60,11 +60,11 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken           string       `json:"access_token"`
-	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
-	RefreshToken          string       `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
-	User                  UserResponse `json:"user"`
+	AccessToken          string       `json:"access_token"`
+	AccessTokenExpiresAt time.Time    `json:"access_token_expires_at"`
+	RenewToken           string       `json:"renew_token"`
+	RenewTokenExpiresAt  time.Time    `json:"renew_token_expires_at"`
+	User                 UserResponse `json:"user"`
 }
 
 func (server *Server) login(ctx *gin.Context) {
@@ -124,11 +124,11 @@ func (server *Server) login(ctx *gin.Context) {
 	}
 
 	resp := LoginResponse{
-		AccessToken:           accessToken,
-		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
-		RefreshToken:          refreshToken,
-		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:                  buildUserResponse(user),
+		AccessToken:          accessToken,
+		AccessTokenExpiresAt: accessPayload.ExpiredAt,
+		RenewToken:           refreshToken,
+		RenewTokenExpiresAt:  refreshPayload.ExpiredAt,
+		User:                 buildUserResponse(user),
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
