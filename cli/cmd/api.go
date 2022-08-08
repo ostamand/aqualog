@@ -14,7 +14,7 @@ import (
 	"github.com/ostamand/aqualog/api"
 )
 
-const apiEndpoint = "http://localhost:8080" // TODO how to not hard code this and get at build time
+const apiEndpoint = "https://aqualog.api.ostamand.com" // TODO how to not hard code this and get at build time
 const reqContentType = "application/json"
 const apiTokenType = "Bearer"
 const apiEndpointEnv = "AQUALOG_ENDPOINT"
