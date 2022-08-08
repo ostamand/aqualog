@@ -25,4 +25,7 @@ server:
 build-cli:
 	go build -o aqualog cli/main.go
 
+install-cli:
+	./scripts/install-cli.sh
+
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc test server
