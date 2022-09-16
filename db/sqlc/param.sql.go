@@ -79,7 +79,7 @@ WHERE p.user_id = $1
 	AND t.name = $2
 	AND p.timestamp >= $3
 	AND p.timestamp < $4
-ORDER BY p.timestamp
+ORDER BY p.timestamp DESC
 LIMIT $6
 OFFSET $5
 `
