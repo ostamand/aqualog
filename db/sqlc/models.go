@@ -20,6 +20,14 @@ type Param struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type ParamOrigin struct {
+	ID            int64     `json:"id"`
+	ParamTypeName string    `json:"param_type_name"`
+	Name          string    `json:"name"`
+	CreatedBy     string    `json:"created_by"`
+	CreatedAt     time.Time `json:"created_at"`
+}
+
 type ParamType struct {
 	ID          int64           `json:"id"`
 	Name        string          `json:"name"`

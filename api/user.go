@@ -130,5 +130,6 @@ func (server *Server) login(ctx *gin.Context) {
 		RenewTokenExpiresAt:  refreshPayload.ExpiredAt,
 		User:                 buildUserResponse(user),
 	}
+
 	ctx.JSON(http.StatusOK, resp)
 }
