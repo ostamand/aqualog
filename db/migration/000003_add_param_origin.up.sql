@@ -12,8 +12,8 @@ CREATE TABLE "param_origins" (
 INSERT INTO param_origins (param_type_name, "name") VALUES
     ('phosphate', 'Hanna - Low Range Phosphate'),
     ('phosphate', 'Hanna - Ultra Low Range Phosphate'),
-    ('phosphate', 'Read Sea - Phosphate Pro'),
-    ('phosphate', 'Read Sea - High Accuracy Phosphate Pro'),
+    ('phosphate', 'Red Sea - Phosphate Pro'),
+    ('phosphate', 'Red Sea - High Accuracy Phosphate Pro'),
     ('phosphate', 'API - Phosphate'),
     ('phosphate', 'Fauna Marin - Aquahometest PO4'), 
     ('nitrate', 'Hanna - Low Range Nitrate'),
