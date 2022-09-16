@@ -25,6 +25,6 @@ WHERE p.user_id = sqlc.arg(user_id)
 	AND t.name = sqlc.arg(param_type_name)
 	AND p.timestamp >= sqlc.arg('from')
 	AND p.timestamp < sqlc.arg('to')
-ORDER BY p.timestamp
+ORDER BY p.timestamp DESC
 LIMIT sqlc.arg('limit')
 OFFSET sqlc.arg('offset');

@@ -29,6 +29,7 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	router := gin.Default()
 	router.Use(corsMiddleware())
 
+	router.GET("/data", server.getData)
 	router.POST("/users", server.createUser)
 	router.POST("/login", server.login)
 	router.POST("/renew_token", server.renewToken)
