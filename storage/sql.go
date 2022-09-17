@@ -24,8 +24,8 @@ type ListSummaryRow struct {
 	Name              string     `json:"name"`
 	Value             float64    `json:"value"`
 	Timestamp         time.Time  `json:"timestamp"`
-	PreviousValue     *float64   `json:"prev_value"`
-	PreviousTimestamp *time.Time `json:"prev_timestamp"`
+	PreviousValue     *float64   `json:"prevValue"`
+	PreviousTimestamp *time.Time `json:"prevTimestamp"`
 }
 
 const listSummary = `WITH a AS (
