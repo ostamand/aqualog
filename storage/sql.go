@@ -21,6 +21,7 @@ func NewSQLStorage(conn *sql.DB) Storage {
 }
 
 type ListSummaryRow struct {
+	ID                int64      `json:"id"`
 	Name              string     `json:"name"`
 	Value             float64    `json:"value"`
 	Timestamp         time.Time  `json:"timestamp"`
@@ -45,6 +46,7 @@ const listSummary = `WITH a AS (
 	ORDER BY param_type_id, "timestamp" DESC
 )
 SELECT
+a.id,
 a.name,
 a."value",
 a."timestamp",
@@ -73,7 +75,7 @@ func (s SQLStorage) ListSummary(ctx context.Context, userID int64) ([]ListSummar
 	items := []ListSummaryRow{}
 	for rows.Next() {
 		var row ListSummaryRow
-		if err := rows.Scan(&row.Name, &row.Value, &row.Timestamp, &row.PreviousValue, &row.PreviousTimestamp); err != nil {
+		if err := rows.Scan(&row.ID, &row.Name, &row.Value, &row.Timestamp, &row.PreviousValue, &row.PreviousTimestamp); err != nil {
 			return nil, err
 		}
 		items = append(items, row)
