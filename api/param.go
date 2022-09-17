@@ -81,7 +81,7 @@ func (server *Server) getSummary(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
 		return
 	}
-	params, err := server.storage.ListParamSummary(ctx, payload.UserID)
+	params, err := server.storage.ListSummary(ctx, payload.UserID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
