@@ -7,9 +7,76 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	db "github.com/ostamand/aqualog/db/sqlc"
+	"github.com/ostamand/aqualog/storage"
 	"github.com/ostamand/aqualog/util"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestSummary(t *testing.T) {
+	ctx := context.Background()
+	user := SaveRandomUser(t)
+	now := time.Now()
+
+	data := []SaveParamArgs{
+		{
+			ParamName: "nitrate",
+			Value:     12,
+			Timestamp: now,
+		},
+		{
+			ParamName: "nitrate",
+			Value:     24,
+			Timestamp: now.Add(time.Hour * 5),
+		},
+		{
+			ParamName: "phosphate",
+			Value:     0.024,
+			Timestamp: now.Add(-time.Hour * 5),
+		},
+	}
+
+	for _, item := range data {
+		value, err := SaveParam(ctx, store, SaveParamArgs{
+			UserID:    user.ID,
+			ParamName: item.ParamName,
+			Value:     item.Value,
+			Timestamp: item.Timestamp,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, item.Value, value.Value)
+		// assert.Equal(t, item.Timestamp, value.Timestamp) TODO: time.Local VS time.UTC
+		assert.Equal(t, user.ID, value.UserID)
+	}
+
+	items, err := store.ListSummary(ctx, user.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, len(data)-1, len(items))
+
+	findWithName := func(name string) *storage.ListSummaryRow {
+		// find & check nitrate
+		var line *storage.ListSummaryRow
+		for _, item := range items {
+			if item.Name == name {
+				line = &item
+				break
+			}
+		}
+		return line
+	}
+
+	// check nitrate
+	line := findWithName(data[0].ParamName)
+	assert.NotNil(t, line)
+	assert.Equal(t, data[1].Value, line.Value)
+	assert.Equal(t, data[0].Value, *line.PreviousValue)
+
+	// check phosphate
+	line = findWithName(data[2].ParamName)
+	assert.NotNil(t, line)
+	assert.Equal(t, data[2].Value, line.Value)
+	assert.Nil(t, line.PreviousValue)
+	assert.Nil(t, line.PreviousTimestamp)
+}
 
 func TestCanSaveNewParam(t *testing.T) {
 	user := SaveRandomUser(t)

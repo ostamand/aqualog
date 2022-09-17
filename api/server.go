@@ -37,6 +37,7 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	authRoutes := router.Use(authMiddleware(server.tokenMaker))
 	authRoutes.POST("/params", server.createParam)
 	authRoutes.GET("/params", server.getParams)
+	authRoutes.GET("/params/summary", server.getSummary)
 
 	server.router = router
 
