@@ -74,3 +74,17 @@ func (server *Server) getParams(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, params)
 }
+
+func (server *Server) getSummary(ctx *gin.Context) {
+	payload, ok := ctx.MustGet(authPayloadKey).(*token.Payload)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
+		return
+	}
+	params, err := server.storage.ListParamSummary(ctx, payload.UserID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, params)
+}
