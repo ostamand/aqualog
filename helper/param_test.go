@@ -69,6 +69,7 @@ func TestSummary(t *testing.T) {
 	assert.NotNil(t, line)
 	assert.Equal(t, data[1].Value, line.Value)
 	assert.Equal(t, data[0].Value, *line.PreviousValue)
+	assert.NotEmpty(t, line.ID)
 
 	// check phosphate
 	line = findWithName(data[2].ParamName)
@@ -76,6 +77,7 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, data[2].Value, line.Value)
 	assert.Nil(t, line.PreviousValue)
 	assert.Nil(t, line.PreviousTimestamp)
+	assert.NotEmpty(t, line.ID)
 }
 
 func TestCanSaveNewParam(t *testing.T) {
