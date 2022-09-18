@@ -116,3 +116,40 @@ func (q *Queries) GetParamTypeByName(ctx context.Context, arg GetParamTypeByName
 	)
 	return i, err
 }
+
+const updateParamType = `-- name: UpdateParamType :one
+UPDATE param_types SET (target, min, max) = ($3, $4, $5)
+WHERE user_id = $1 and id = $2
+RETURNING id, name, description, unit, user_id, target, min, max, created_at
+`
+
+type UpdateParamTypeParams struct {
+	UserID int64           `json:"user_id"`
+	ID     int64           `json:"id"`
+	Target sql.NullFloat64 `json:"target"`
+	Min    sql.NullFloat64 `json:"min"`
+	Max    sql.NullFloat64 `json:"max"`
+}
+
+func (q *Queries) UpdateParamType(ctx context.Context, arg UpdateParamTypeParams) (ParamType, error) {
+	row := q.db.QueryRowContext(ctx, updateParamType,
+		arg.UserID,
+		arg.ID,
+		arg.Target,
+		arg.Min,
+		arg.Max,
+	)
+	var i ParamType
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Unit,
+		&i.UserID,
+		&i.Target,
+		&i.Min,
+		&i.Max,
+		&i.CreatedAt,
+	)
+	return i, err
+}
