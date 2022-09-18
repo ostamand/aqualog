@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,29 @@ type getParamsRequest struct {
 	Offset    int32     `form:"offset,default=0"`
 	From      time.Time `form:"from"`
 	To        time.Time `form:"to"`
+}
+
+func (server *Server) getParam(ctx *gin.Context) {
+	// check if user has access
+	payload, ok := ctx.MustGet(authPayloadKey).(*token.Payload)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
+		return
+	}
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	param, err := server.storage.GetParamByID(ctx, db.GetParamByIDParams{
+		ID:     id,
+		UserID: payload.UserID,
+	})
+	if err != nil || (db.GetParamByIDRow{}) == param {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, param)
 }
 
 func (server *Server) getParams(ctx *gin.Context) {
