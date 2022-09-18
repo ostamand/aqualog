@@ -25,6 +25,7 @@ type Querier interface {
 	ListParamOrigins(ctx context.Context, paramTypeName string) ([]ParamOrigin, error)
 	ListParamsByType(ctx context.Context, arg ListParamsByTypeParams) ([]ListParamsByTypeRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	UpdateParamType(ctx context.Context, arg UpdateParamTypeParams) (ParamType, error)
 }
 
 var _ Querier = (*Queries)(nil)

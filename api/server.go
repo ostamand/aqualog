@@ -39,6 +39,7 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	authRoutes.GET("/params", server.getParams)
 	authRoutes.GET("/params/:id", server.getParam)
 	authRoutes.GET("/params/summary", server.getSummary)
+	authRoutes.PATCH("/params/types/:id", server.updateParamType)
 
 	server.router = router
 
