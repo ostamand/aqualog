@@ -76,6 +76,7 @@ SELECT
 p.id as param_id,
 t.id as param_type_id,
 p."value",
+p.timestamp,
 t."name",
 CASE WHEN t.target IS NULL THEN -999 ELSE t.target END AS target,
 CASE WHEN t."min" IS NULL THEN -999 ELSE t."min" END AS "min",
@@ -96,6 +97,7 @@ type GetParamByIDRow struct {
 	ParamID     int64       `json:"param_id"`
 	ParamTypeID int64       `json:"param_type_id"`
 	Value       float64     `json:"value"`
+	Timestamp   time.Time   `json:"timestamp"`
 	Name        string      `json:"name"`
 	Target      interface{} `json:"target"`
 	Min         interface{} `json:"min"`
@@ -110,6 +112,7 @@ func (q *Queries) GetParamByID(ctx context.Context, arg GetParamByIDParams) (Get
 		&i.ParamID,
 		&i.ParamTypeID,
 		&i.Value,
+		&i.Timestamp,
 		&i.Name,
 		&i.Target,
 		&i.Min,

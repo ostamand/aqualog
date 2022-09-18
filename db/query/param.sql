@@ -22,6 +22,7 @@ SELECT
 p.id as param_id,
 t.id as param_type_id,
 p."value",
+p.timestamp,
 t."name",
 CASE WHEN t.target IS NULL THEN -999 ELSE t.target END AS target,
 CASE WHEN t."min" IS NULL THEN -999 ELSE t."min" END AS "min",
