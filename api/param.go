@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	db "github.com/ostamand/aqualog/db/sqlc"
 	"github.com/ostamand/aqualog/helper"
+	"github.com/ostamand/aqualog/storage"
 	"github.com/ostamand/aqualog/token"
 )
 
@@ -60,11 +61,8 @@ func (server *Server) getParam(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	param, err := server.storage.GetParamByID(ctx, db.GetParamByIDParams{
-		ID:     id,
-		UserID: payload.UserID,
-	})
-	if err != nil || (db.GetParamByIDRow{}) == param {
+	param, err := server.storage.GetParamByID(ctx, payload.UserID, id)
+	if err != nil || (storage.GetParamByIDRow{}) == param {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
