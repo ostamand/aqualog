@@ -1,0 +1,1 @@
+ALTER TABLE "param_types" ADD COLUMN "digits" int8;

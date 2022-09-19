@@ -18,7 +18,8 @@ INSERT INTO param_types (
   user_id,
   target,
   min,
-  max
+  max,
+  digits
 ) VALUES (
   $1, 
   $2, 
@@ -26,9 +27,10 @@ INSERT INTO param_types (
   $4,
   $5,
   $6,
-  $7
+  $7,
+  $8
 ) 
-RETURNING id, name, description, unit, user_id, target, min, max, created_at
+RETURNING id, name, description, unit, user_id, target, min, max, created_at, digits
 `
 
 type CreateParamTypeParams struct {
@@ -39,6 +41,7 @@ type CreateParamTypeParams struct {
 	Target      sql.NullFloat64 `json:"target"`
 	Min         sql.NullFloat64 `json:"min"`
 	Max         sql.NullFloat64 `json:"max"`
+	Digits      sql.NullInt64   `json:"digits"`
 }
 
 func (q *Queries) CreateParamType(ctx context.Context, arg CreateParamTypeParams) (ParamType, error) {
@@ -50,6 +53,7 @@ func (q *Queries) CreateParamType(ctx context.Context, arg CreateParamTypeParams
 		arg.Target,
 		arg.Min,
 		arg.Max,
+		arg.Digits,
 	)
 	var i ParamType
 	err := row.Scan(
@@ -62,12 +66,13 @@ func (q *Queries) CreateParamType(ctx context.Context, arg CreateParamTypeParams
 		&i.Min,
 		&i.Max,
 		&i.CreatedAt,
+		&i.Digits,
 	)
 	return i, err
 }
 
 const getParamType = `-- name: GetParamType :one
-SELECT id, name, description, unit, user_id, target, min, max, created_at FROM param_types
+SELECT id, name, description, unit, user_id, target, min, max, created_at, digits FROM param_types
 WHERE id = $1
 LIMIT 1
 `
@@ -85,12 +90,13 @@ func (q *Queries) GetParamType(ctx context.Context, id int64) (ParamType, error)
 		&i.Min,
 		&i.Max,
 		&i.CreatedAt,
+		&i.Digits,
 	)
 	return i, err
 }
 
 const getParamTypeByName = `-- name: GetParamTypeByName :one
-SELECT id, name, description, unit, user_id, target, min, max, created_at FROM param_types
+SELECT id, name, description, unit, user_id, target, min, max, created_at, digits FROM param_types
 WHERE user_id = $1 AND name = $2
 LIMIT 1
 `
@@ -113,14 +119,15 @@ func (q *Queries) GetParamTypeByName(ctx context.Context, arg GetParamTypeByName
 		&i.Min,
 		&i.Max,
 		&i.CreatedAt,
+		&i.Digits,
 	)
 	return i, err
 }
 
 const updateParamType = `-- name: UpdateParamType :one
-UPDATE param_types SET (target, min, max) = ($3, $4, $5)
+UPDATE param_types SET (target, min, max, digits) = ($3, $4, $5, $6)
 WHERE user_id = $1 and id = $2
-RETURNING id, name, description, unit, user_id, target, min, max, created_at
+RETURNING id, name, description, unit, user_id, target, min, max, created_at, digits
 `
 
 type UpdateParamTypeParams struct {
@@ -129,6 +136,7 @@ type UpdateParamTypeParams struct {
 	Target sql.NullFloat64 `json:"target"`
 	Min    sql.NullFloat64 `json:"min"`
 	Max    sql.NullFloat64 `json:"max"`
+	Digits sql.NullInt64   `json:"digits"`
 }
 
 func (q *Queries) UpdateParamType(ctx context.Context, arg UpdateParamTypeParams) (ParamType, error) {
@@ -138,6 +146,7 @@ func (q *Queries) UpdateParamType(ctx context.Context, arg UpdateParamTypeParams
 		arg.Target,
 		arg.Min,
 		arg.Max,
+		arg.Digits,
 	)
 	var i ParamType
 	err := row.Scan(
@@ -150,6 +159,7 @@ func (q *Queries) UpdateParamType(ctx context.Context, arg UpdateParamTypeParams
 		&i.Min,
 		&i.Max,
 		&i.CreatedAt,
+		&i.Digits,
 	)
 	return i, err
 }
