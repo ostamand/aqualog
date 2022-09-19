@@ -27,6 +27,9 @@ type ListSummaryRow struct {
 	Timestamp         time.Time  `json:"timestamp"`
 	PreviousValue     *float64   `json:"prevValue"`
 	PreviousTimestamp *time.Time `json:"prevTimestamp"`
+	Target            *float64   `json:"target"`
+	Min               *float64   `json:"min"`
+	Max               *float64   `json:"max"`
 }
 
 const listSummary = `WITH a AS (
@@ -51,7 +54,10 @@ a.name,
 a."value",
 a."timestamp",
 b.last_value,
-b.last_timestamp
+b.last_timestamp,
+a.target,
+a."min",
+a."max"
 FROM a 
 LEFT JOIN (
 	SELECT
@@ -75,7 +81,17 @@ func (s SQLStorage) ListSummary(ctx context.Context, userID int64) ([]ListSummar
 	items := []ListSummaryRow{}
 	for rows.Next() {
 		var row ListSummaryRow
-		if err := rows.Scan(&row.ID, &row.Name, &row.Value, &row.Timestamp, &row.PreviousValue, &row.PreviousTimestamp); err != nil {
+		if err := rows.Scan(
+			&row.ID,
+			&row.Name,
+			&row.Value,
+			&row.Timestamp,
+			&row.PreviousValue,
+			&row.PreviousTimestamp,
+			&row.Target,
+			&row.Min,
+			&row.Max,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, row)
