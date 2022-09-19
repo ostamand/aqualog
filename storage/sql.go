@@ -99,6 +99,50 @@ func (s SQLStorage) ListSummary(ctx context.Context, userID int64) ([]ListSummar
 	return items, nil
 }
 
+const getParamByID = `SELECT 
+p.id as param_id,
+t.id as param_type_id,
+p."value",
+p.timestamp,
+t."name",
+t.target,
+t."min",
+t."max",
+p.created_at
+FROM params as p
+INNER JOIN param_types AS t ON p.param_type_id = t.id
+WHERE p.user_id=$1 AND p.id = $2
+LIMIT 1;`
+
+type GetParamByIDRow struct {
+	ParamID     int64     `json:"param_id"`
+	ParamTypeID int64     `json:"param_type_id"`
+	Value       float64   `json:"value"`
+	Timestamp   time.Time `json:"timestamp"`
+	Name        string    `json:"name"`
+	Target      *float64  `json:"target"`
+	Min         *float64  `json:"min"`
+	Max         *float64  `json:"max"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (s SQLStorage) GetParamByID(ctx context.Context, userID int64, paramID int64) (GetParamByIDRow, error) {
+	row := s.db.QueryRowContext(ctx, getParamByID, userID, paramID)
+	var i GetParamByIDRow
+	err := row.Scan(
+		&i.ParamID,
+		&i.ParamTypeID,
+		&i.Value,
+		&i.Timestamp,
+		&i.Name,
+		&i.Target,
+		&i.Min,
+		&i.Max,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 func (s SQLStorage) executeTx(ctx context.Context, fn func(*db.Queries) error) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {

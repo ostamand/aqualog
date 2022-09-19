@@ -71,57 +71,6 @@ func (q *Queries) GetParam(ctx context.Context, id int64) (Param, error) {
 	return i, err
 }
 
-const getParamByID = `-- name: GetParamByID :one
-SELECT 
-p.id as param_id,
-t.id as param_type_id,
-p."value",
-p.timestamp,
-t."name",
-CASE WHEN t.target IS NULL THEN -999 ELSE t.target END AS target,
-CASE WHEN t."min" IS NULL THEN -999 ELSE t."min" END AS "min",
-CASE WHEN t."max" IS NULL THEN -999 ELSE t."max" END AS "max",
-p.created_at
-FROM params as p
-INNER JOIN param_types AS t ON p.param_type_id = t.id
-WHERE p.user_id=$2 AND p.id = $1
-LIMIT 1
-`
-
-type GetParamByIDParams struct {
-	ID     int64 `json:"id"`
-	UserID int64 `json:"user_id"`
-}
-
-type GetParamByIDRow struct {
-	ParamID     int64       `json:"param_id"`
-	ParamTypeID int64       `json:"param_type_id"`
-	Value       float64     `json:"value"`
-	Timestamp   time.Time   `json:"timestamp"`
-	Name        string      `json:"name"`
-	Target      interface{} `json:"target"`
-	Min         interface{} `json:"min"`
-	Max         interface{} `json:"max"`
-	CreatedAt   time.Time   `json:"created_at"`
-}
-
-func (q *Queries) GetParamByID(ctx context.Context, arg GetParamByIDParams) (GetParamByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getParamByID, arg.ID, arg.UserID)
-	var i GetParamByIDRow
-	err := row.Scan(
-		&i.ParamID,
-		&i.ParamTypeID,
-		&i.Value,
-		&i.Timestamp,
-		&i.Name,
-		&i.Target,
-		&i.Min,
-		&i.Max,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const listParamsByType = `-- name: ListParamsByType :many
 SELECT p.id, p.value, p.timestamp, p.created_at 
 FROM params as p
