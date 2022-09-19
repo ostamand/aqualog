@@ -1,1 +1,1 @@
-ALTER TABLE "param_types" ADD COLUMN "n_digits" int8;
+ALTER TABLE "param_types" ADD COLUMN "digits" int8;

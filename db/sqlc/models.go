@@ -38,6 +38,7 @@ type ParamType struct {
 	Min         sql.NullFloat64 `json:"min"`
 	Max         sql.NullFloat64 `json:"max"`
 	CreatedAt   time.Time       `json:"created_at"`
+	Digits      sql.NullInt64   `json:"digits"`
 }
 
 type Session struct {

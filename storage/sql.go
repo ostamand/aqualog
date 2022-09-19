@@ -30,6 +30,7 @@ type ListSummaryRow struct {
 	Target            *float64   `json:"target"`
 	Min               *float64   `json:"min"`
 	Max               *float64   `json:"max"`
+	Digits            *int64     `json:"digits"`
 }
 
 const listSummary = `WITH a AS (
@@ -40,6 +41,7 @@ const listSummary = `WITH a AS (
 	t.target,
 	t."min",
 	t."max",
+	t."digits",
 	params."value",
 	params.timestamp,
 	params.created_at
@@ -57,7 +59,8 @@ b.last_value,
 b.last_timestamp,
 a.target,
 a."min",
-a."max"
+a."max", 
+a."digits"
 FROM a 
 LEFT JOIN (
 	SELECT
@@ -91,6 +94,7 @@ func (s SQLStorage) ListSummary(ctx context.Context, userID int64) ([]ListSummar
 			&row.Target,
 			&row.Min,
 			&row.Max,
+			&row.Digits,
 		); err != nil {
 			return nil, err
 		}
@@ -108,6 +112,7 @@ t."name",
 t.target,
 t."min",
 t."max",
+t."digits",
 p.created_at
 FROM params as p
 INNER JOIN param_types AS t ON p.param_type_id = t.id
@@ -123,6 +128,7 @@ type GetParamByIDRow struct {
 	Target      *float64  `json:"target"`
 	Min         *float64  `json:"min"`
 	Max         *float64  `json:"max"`
+	Digits      *int64    `json:"digits"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
@@ -138,6 +144,7 @@ func (s SQLStorage) GetParamByID(ctx context.Context, userID int64, paramID int6
 		&i.Target,
 		&i.Min,
 		&i.Max,
+		&i.Digits,
 		&i.CreatedAt,
 	)
 	return i, err

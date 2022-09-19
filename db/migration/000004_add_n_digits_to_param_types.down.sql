@@ -1,1 +1,1 @@
-ALTER TABLE "param_types" DROP COLUMN "n_digits";
+ALTER TABLE "param_types" DROP COLUMN "digits";

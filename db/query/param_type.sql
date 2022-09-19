@@ -9,7 +9,7 @@ WHERE id = $1
 LIMIT 1;
 
 -- name: UpdateParamType :one
-UPDATE param_types SET (target, min, max) = ($3, $4, $5)
+UPDATE param_types SET (target, min, max, digits) = ($3, $4, $5, $6)
 WHERE user_id = $1 and id = $2
 RETURNING * ;
 
@@ -21,7 +21,8 @@ INSERT INTO param_types (
   user_id,
   target,
   min,
-  max
+  max,
+  digits
 ) VALUES (
   $1, 
   $2, 
@@ -29,6 +30,7 @@ INSERT INTO param_types (
   $4,
   $5,
   $6,
-  $7
+  $7,
+  $8
 ) 
 RETURNING *;
