@@ -13,7 +13,7 @@ import (
 )
 
 type CreateParamRequest struct {
-	Value     float64   `json:"value" binding:"required,min=0"`
+	Value     float64   `json:"value"`
 	ParamType string    `json:"type" binding:"required"`
 	Timestamp time.Time `json:"timestamp"`
 }
