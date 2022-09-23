@@ -35,10 +35,15 @@ func NewServer(config util.Config, s storage.Storage) *Server {
 	router.POST("/renew_token", server.renewToken)
 
 	authRoutes := router.Use(authMiddleware(server.tokenMaker))
+
+	// params
 	authRoutes.POST("/params", server.createParam)
-	authRoutes.GET("/params", server.getParams)
+	authRoutes.GET("/params", server.listParams)
 	authRoutes.GET("/params/:id", server.getParam)
+	authRoutes.DELETE("/params/:id", server.deleteParam)
 	authRoutes.GET("/params/summary", server.getSummary)
+
+	// param types
 	authRoutes.PATCH("/params/types/:id", server.updateParamType)
 
 	server.router = router
