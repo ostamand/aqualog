@@ -28,3 +28,7 @@ WHERE p.user_id = sqlc.arg(user_id)
 ORDER BY p.timestamp DESC
 LIMIT sqlc.arg('limit')
 OFFSET sqlc.arg('offset');
+
+-- name: DeleteParam :exec
+DELETE FROM params 
+WHERE id = $1 and user_id = $2;

@@ -69,7 +69,29 @@ func (server *Server) getParam(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, param)
 }
 
-func (server *Server) getParams(ctx *gin.Context) {
+func (server *Server) deleteParam(ctx *gin.Context) {
+	payload, ok := ctx.MustGet(authPayloadKey).(*token.Payload)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, token.ErrInvalidToken)
+		return
+	}
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	err = server.storage.DeleteParam(ctx, db.DeleteParamParams{
+		ID:     id,
+		UserID: payload.UserID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
+
+func (server *Server) listParams(ctx *gin.Context) {
 	var req getParamsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

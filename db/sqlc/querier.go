@@ -15,6 +15,7 @@ type Querier interface {
 	CreateParamType(ctx context.Context, arg CreateParamTypeParams) (ParamType, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteParam(ctx context.Context, arg DeleteParamParams) error
 	DeleteUser(ctx context.Context, id int64) error
 	GetParam(ctx context.Context, id int64) (Param, error)
 	GetParamType(ctx context.Context, id int64) (ParamType, error)

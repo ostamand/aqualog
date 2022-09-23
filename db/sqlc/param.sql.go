@@ -51,6 +51,21 @@ func (q *Queries) CreateParam(ctx context.Context, arg CreateParamParams) (Param
 	return i, err
 }
 
+const deleteParam = `-- name: DeleteParam :exec
+DELETE FROM params 
+WHERE id = $1 and user_id = $2
+`
+
+type DeleteParamParams struct {
+	ID     int64 `json:"id"`
+	UserID int64 `json:"user_id"`
+}
+
+func (q *Queries) DeleteParam(ctx context.Context, arg DeleteParamParams) error {
+	_, err := q.db.ExecContext(ctx, deleteParam, arg.ID, arg.UserID)
+	return err
+}
+
 const getParam = `-- name: GetParam :one
 SELECT id, user_id, param_type_id, value, timestamp, created_at FROM params
 WHERE id = $1
